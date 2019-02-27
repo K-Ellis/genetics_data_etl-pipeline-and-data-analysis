@@ -1,7 +1,7 @@
 # genetics_data_etl-pipeline-and-data-analysis
 
 Interactive Analysis Dashboard:
-https://public.tableau.com/profile/kieron4186#!/vizhome/SophiaGeneticsInteractiveDataAnalysis/
+https://public.tableau.com/profile/kieron4186#!/vizhome/SophiaGeneticsInteractiveDataAnalysis/GeneticsData
 
 Directions to run etl.py from docker and export PostgreSQL database (from Windows 10 home OS):
 1. install docker and docker-compose
