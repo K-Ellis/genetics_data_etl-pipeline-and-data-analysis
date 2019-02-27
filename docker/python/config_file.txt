@@ -1,0 +1,5 @@
+dbname='base123' user='postgres' host='db' password='pw1234'
+input_data_dir=code/data/data.tsv
+raw_data_table_name=raw_data_table
+fact_table_name=fact_table
+dimension_table_name=dimension_table

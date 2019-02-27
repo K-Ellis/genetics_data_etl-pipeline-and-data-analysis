@@ -1,0 +1,26 @@
+version: '3'    
+services:
+    db:
+        image: 'postgres:latest'
+        expose:
+            - "5432"
+        ports:
+            - "5559:5432"
+        environment:
+            POSTGRES_PASSWORD: pw1234
+            POSTGRES_DB: base123
+        restart: 
+            always
+        volumes:
+            - db_data:/var/lib/postgresql/data
+    py_app:
+        build: .
+        restart: 
+            on-failure:5 
+        depends_on: 
+            - db
+        command: >
+            sh -c "python code/python/etl.py"
+volumes:
+    db_data:
+        external: true

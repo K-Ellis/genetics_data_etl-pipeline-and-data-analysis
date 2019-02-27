@@ -1,0 +1,84 @@
+version: '3'
+services:
+    app:
+        build: .
+        command: python code/python/etl.py
+        volumes:
+            - .:/code
+        depends_on:
+            - db
+        restart: always
+    db:
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASWORD: postgres
+            POSTGRES_DB: db_genetics_1
+        ports:
+            - "5432:5432"
+            
+            ---
+            
+
+        links:
+            - db:db_genetics_1
+        depends_on:
+            - db
+
+services:
+    db:
+        image: postgres:latest
+        restart: always
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASWORD: postgres
+          POSTGRES_DB: db_genetics_1
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - 5432:5432
+    app:
+        build: .
+        restart: always
+        links:
+          - db
+        environment:
+          - DB_HOST = db
+          - BAR = FOO
+        depends_on:
+          - db
+        command: [ "python3", "./code/bye.py" ]
+volumes:
+    postgres_data:
+        driver: local
+
+services:
+  db:
+    restart: always
+    image: nikitph/portcastdbimage:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG = false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  scraper:
+    build: .
+    restart: always
+    links:
+      - db
+    environment:
+      - DB_HOST = db
+      - BAR = FOO
+    depends_on:
+      db:
+        condition: service_healthy
+    command: [ "python3", "./cycloneprocess.py" ]
+    
+    
+     self.connection = psycopg2.connect(host='db', user=username, password=password, dbname=database)
