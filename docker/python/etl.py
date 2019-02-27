@@ -3,7 +3,7 @@ from etl_functions import *
 
 # todo - remove second config var
 postgres_config_file_dir = "code/python/config_file.txt"
-postgres_config_file_dir = "config_file.txt"  # remove!
+#postgres_config_file_dir = "config_file.txt"
 
 postgres_config, db_name, input_data_dir, raw_data_table_name, \
         fact_table_name, dimension_table_name =read_config_file(postgres_config_file_dir)
@@ -85,6 +85,13 @@ cur.execute("""ALTER TABLE %s ADD CONSTRAINT "dimension_ID_FK_constraint"
 # remove dimension columns from fact table
 for col in dimension_names_formatted:
     cur.execute(""" ALTER TABLE %s DROP COLUMN %s;""" % (fact_table_name, col))
+    
+# create indexes
+for col in fact_names_formatted:
+    cur.execute("""CREATE INDEX idx_%s ON %s(%s)""" % (col, fact_table_name, col))
+    
+for col in dimension_names_formatted:
+    cur.execute("""CREATE INDEX idx_%s ON %s(%s)""" % (col, dimension_table_name, col))
     
 # count the number of records in the new database when the fact and dimension tables are joined
 cur.execute("""select count(*) from fact_table left join dimension_table
