@@ -1,9 +1,8 @@
 import psycopg2
 from etl_functions import *
 
-# todo - remove second config var
 postgres_config_file_dir = "code/python/config_file.txt"
-#postgres_config_file_dir = "config_file.txt"
+# postgres_config_file_dir = "config_file.txt"
 
 postgres_config, db_name, input_data_dir, raw_data_table_name, \
         fact_table_name, dimension_table_name =read_config_file(postgres_config_file_dir)
@@ -94,16 +93,21 @@ for col in dimension_names_formatted:
     cur.execute("""CREATE INDEX idx_%s ON %s(%s)""" % (col, dimension_table_name, col))
     
 # count the number of records in the new database when the fact and dimension tables are joined
-cur.execute("""select count(*) from fact_table left join dimension_table
-on fact_table.dimension_ID_FK = dimension_table.id
-""")
-print("number of rows = ", cur.fetchone())
+cur.execute("""select count(*) from %s left join %s
+            on %s.dimension_ID_FK = %s.id
+            """ % (fact_table_name, dimension_table_name, fact_table_name, dimension_table_name))
+fact_dim_rows = cur.fetchone()
+print("number of rows in fact/dimension join = ", fact_dim_rows)
+
+cur.execute("""select count(*) from %s""" % raw_data_table_name)
+raw_rows = cur.fetchone()
+print("Number of rows in fact/dimension join equal to number of rows in raw data table: ", fact_dim_rows == raw_rows)
 
 # inspect the first row of the fact and dimension tables when joined
-cur.execute("""select * from fact_table left join dimension_table
-on fact_table.dimension_ID_FK = dimension_table.id
-""")
-print("first row = ", cur.fetchone())
+cur.execute("""select * from %s left join %s
+            on %s.dimension_ID_FK = %s.id
+            """ % (fact_table_name, dimension_table_name, fact_table_name, dimension_table_name))
+print("\nfirst row of fact/dim join = ", cur.fetchone())
 
 con.close()
 
